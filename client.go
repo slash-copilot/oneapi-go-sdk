@@ -56,7 +56,7 @@ func (c *Client) NewHttpClient(ctx context.Context, method, requestUrl string, r
 			}
 		}
 		r, err = http.NewRequestWithContext(ctx, method, requestUrl, http.NoBody)
-	} else if method == http.MethodPost || method == http.MethodPut {
+	} else if method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch {
 		var b io.Reader
 		if len(request) > 0 {
 			var reqBytes []byte
