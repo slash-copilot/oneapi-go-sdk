@@ -3,14 +3,15 @@ package test
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"testing"
 
 	oneapigosdk "github.com/slash-copilot/oneapi-go-sdk"
 )
 
 var (
-	host        = "https://oneapi.cxtx-ai.com"
-	accessToken = "accessToken"
+	host        = os.Getenv("ONEAPI_HOST")
+	accessToken = os.Getenv("ONEAPI_ACCESS_TOKEN")
 )
 
 func TestClient(t *testing.T) {
@@ -54,8 +55,7 @@ func TestUpdateToken(t *testing.T) {
 
 	var res *oneapigosdk.UpdateTokenResp
 	if res, err = client.Api().UpdateToken(ctx, &oneapigosdk.UpdateTokenReq{
-		Id:             14,
-		UserId:         5,
+		Key: "",
 		Name:           "test2",
 		RemainQuota:    0,
 		ExpiredTime:    -1,
