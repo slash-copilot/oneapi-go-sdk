@@ -10,11 +10,6 @@ var (
 	token = "/api/token"
 )
 
-type AddTokenResp struct {
-	Message string `json:"message"`
-	Success bool   `json:"success"`
-}
-
 type Token struct {
 	Id             int    `json:"id"`
 	UserId         int    `json:"user_id"`
@@ -27,6 +22,33 @@ type Token struct {
 	RemainQuota    int    `json:"remain_quota" gorm:"default:0"`
 	UnlimitedQuota bool   `json:"unlimited_quota" gorm:"default:false"`
 	UsedQuota      int    `json:"used_quota" gorm:"default:0"` // used quota
+}
+
+type AddTokenReq struct {
+	Name           string `json:"name" gorm:"index" `
+	ExpiredTime    int64  `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
+	RemainQuota    int    `json:"remain_quota" gorm:"default:0"`
+	UnlimitedQuota bool   `json:"unlimited_quota" gorm:"default:false"`
+}
+
+type AddTokenResp struct {
+	Message string `json:"message"`
+	Success bool   `json:"success"`
+}
+
+type UpdateTokenReq struct {
+	Id             int    `json:"id"`
+	UserId         int    `json:"user_id"`
+	Name           string `json:"name" gorm:"index" `
+	ExpiredTime    int64  `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
+	RemainQuota    int    `json:"remain_quota" gorm:"default:0"`
+	UnlimitedQuota bool   `json:"unlimited_quota" gorm:"default:false"`
+}
+
+type UpdateTokenResp struct {
+	Data    *Token `json:"data"`
+	Message string `json:"message"`
+	Success bool   `json:"success"`
 }
 
 type Api struct {
@@ -55,9 +77,13 @@ func (api *Api) createPostRequest(ctx context.Context, url string, req ...interf
 	return api.createBaseRequest(ctx, http.MethodPost, url, req...)
 }
 
-func (api *Api) AddToken(ctx context.Context, req *Token) (resp *AddTokenResp, err error) {
+func (api *Api) createPutRequest(ctx context.Context, url string, req ...interface{}) (*http.Request, error) {
+	return api.createBaseRequest(ctx, http.MethodPut, url, req...)
+}
+
+func (api *Api) AddToken(ctx context.Context, req *AddTokenReq) (resp *AddTokenResp, err error) {
 	if req == nil {
-		err = errors.New("AddToken.Token Illegal")
+		err = errors.New("AddToken.AddTokenReq Illegal")
 		return
 	}
 
@@ -67,6 +93,24 @@ func (api *Api) AddToken(ctx context.Context, req *Token) (resp *AddTokenResp, e
 	}
 
 	var _resp AddTokenResp
+
+	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
+	resp = &_resp
+	return
+}
+
+func (api *Api) UpdateToken(ctx context.Context, req *UpdateTokenReq) (resp *UpdateTokenResp, err error) {
+	if req == nil {
+		err = errors.New("UpdateToken.UpdateTokenReq Illegal")
+		return
+	}
+
+	var r *http.Request
+	if r, err = api.createPutRequest(ctx, api.buildRequestApi(token), req); err != nil {
+		return
+	}
+
+	var _resp UpdateTokenResp
 
 	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
 	resp = &_resp

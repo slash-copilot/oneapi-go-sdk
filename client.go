@@ -56,7 +56,7 @@ func (c *Client) NewHttpClient(ctx context.Context, method, requestUrl string, r
 			}
 		}
 		r, err = http.NewRequestWithContext(ctx, method, requestUrl, http.NoBody)
-	} else if method == http.MethodPost {
+	} else if method == http.MethodPost || method == http.MethodPut {
 		var b io.Reader
 		if len(request) > 0 {
 			var reqBytes []byte
@@ -69,7 +69,7 @@ func (c *Client) NewHttpClient(ctx context.Context, method, requestUrl string, r
 		}
 		r, err = http.NewRequestWithContext(ctx, method, requestUrl, b)
 	} else {
-		err = errors.New("NewHttpRequest.method must be http.MethodGet or http.MethodPost")
+		err = errors.New("NewHttpRequest.method must be http.MethodGet or http.MethodPost or http.MethodPut")
 	}
 	return
 }
