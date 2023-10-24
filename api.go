@@ -2,12 +2,15 @@ package oneapigosdk
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"net/url"
 )
 
 var (
-	PATH_TOKEN = "/api/token"
+	PATH_TOKEN      = "/api/token"
 	PATH_TOKEN_INFO = "/api/token/info"
+	PATH_ALL_LOGS   = "/api/log"
 )
 
 type Token struct {
@@ -38,7 +41,7 @@ type AddTokenResp struct {
 }
 
 type UpdateTokenReq struct {
-	Key 		  string `json:"key"`
+	Key            string `json:"key"`
 	Name           string `json:"name"`
 	ExpiredTime    int64  `json:"expired_time"`
 	RemainQuota    int    `json:"remain_quota"`
@@ -53,6 +56,38 @@ type GetTokenResp struct {
 
 type UpdateTokenResp struct {
 	Data    *Token `json:"data"`
+	Message string `json:"message"`
+	Success bool   `json:"success"`
+}
+
+type Log struct {
+	Id               int    `json:"id;index:idx_created_at_id,priority:1"`
+	UserId           int    `json:"user_id"`
+	CreatedAt        int64  `json:"created_at"`
+	Type             int    `json:"type"`
+	Content          string `json:"content"`
+	Username         string `json:"username"`
+	TokenName        string `json:"token_name"`
+	ModelName        string `json:"model_name"`
+	Quota            int    `json:"quota"`
+	PromptTokens     int    `json:"prompt_tokens"`
+	CompletionTokens int    `json:"completion_tokens"`
+	ChannelId        int    `json:"channel"`
+}
+
+type GetAllLogsReq struct {
+	P              int    `json:"p"`
+	Type           int    `json:"type"`
+	Username       string `json:"username"`
+	TokenName      string `json:"token_name"`
+	ModelName      string `json:"model_name"`
+	StartTimestamp int64  `json:"start_timestamp"`
+	EndTimestamp   int64  `json:"end_timestamp"`
+	Channel        int    `json:"channel"`
+}
+
+type GetAllLogsResp struct {
+	Data    []*Log `json:"data"`
 	Message string `json:"message"`
 	Success bool   `json:"success"`
 }
@@ -113,7 +148,6 @@ func (api *Api) UpdateToken(ctx context.Context, req *UpdateTokenReq) (resp *Upd
 	return
 }
 
-
 func (api *Api) GetTokenStatus(ctx context.Context, key string) (resp *GetTokenResp, err error) {
 	var r *http.Request
 	if r, err = api.createGetRequest(ctx, api.buildRequestApi(PATH_TOKEN_INFO+"/"+key)); err != nil {
@@ -121,6 +155,28 @@ func (api *Api) GetTokenStatus(ctx context.Context, key string) (resp *GetTokenR
 	}
 
 	var _resp GetTokenResp
+	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
+	resp = &_resp
+	return
+}
+
+func (api *Api) GetAllLogs(ctx context.Context, req *GetAllLogsReq) (resp *GetAllLogsResp, err error) {
+	var u = url.Values{}
+	u.Set("p", fmt.Sprintf("%d", req.P))
+	u.Set("type", fmt.Sprintf("%d", req.Type))
+	u.Set("username", req.Username)
+	u.Set("token_name", req.TokenName)
+	u.Set("model_name", req.ModelName)
+	u.Set("start_timestamp", fmt.Sprintf("%d", req.StartTimestamp))
+	u.Set("end_timestamp", fmt.Sprintf("%d", req.EndTimestamp))
+	u.Set("channel", fmt.Sprintf("%d", req.Channel))
+
+	var r *http.Request
+	if r, err = api.createGetRequest(ctx, api.buildRequestApi(PATH_ALL_LOGS), u); err != nil {
+		return
+	}
+
+	var _resp GetAllLogsResp
 	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
 	resp = &_resp
 	return

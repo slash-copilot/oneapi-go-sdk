@@ -2,8 +2,10 @@ package test
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"testing"
+	"time"
 
 	oneapigosdk "github.com/slash-copilot/oneapi-go-sdk"
 )
@@ -62,4 +64,26 @@ func TestUpdateToken(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	t.Log(res)
+}
+
+func TestGetAllLogs(t *testing.T) {
+	var client = oneapigosdk.NewClient(ONEAPI_HOST, ONEAPI_ACCESS_TOKEN)
+	var err error
+	var ctx = context.Background()
+
+	var res *oneapigosdk.GetAllLogsResp
+	if res, err = client.Api().GetAllLogs(ctx, &oneapigosdk.GetAllLogsReq{
+		P:              0,
+		Type:           0,
+		Username:       "",
+		TokenName:      "",
+		ModelName:      "",
+		StartTimestamp: 0,
+		EndTimestamp:   time.Now().Unix(),
+		Channel:        0,
+	}); err != nil {
+		t.Fatal(err.Error())
+	}
+	j, _ := json.Marshal(res)
+	t.Log(string(j))
 }
