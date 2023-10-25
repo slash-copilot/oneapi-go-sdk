@@ -72,9 +72,26 @@ func TestGetAllLogs(t *testing.T) {
 
 	var res *oneapigosdk.GetAllLogsResp
 	var pageNo = 1
-	
+
 	if res, err = client.Api().GetAllLogs(ctx, &oneapigosdk.GetAllLogsReq{
 		P:	&pageNo,
+	}); err != nil {
+		t.Fatal(err.Error())
+	}
+	j, _ := json.Marshal(res)
+	t.Log(string(j))
+}
+
+func TestRechargeToken(t *testing.T) {
+	var client = oneapigosdk.NewClient(ONEAPI_HOST, ONEAPI_ACCESS_TOKEN)
+	var err error
+	var ctx = context.Background()
+
+	var res *oneapigosdk.RechargeTokenResp
+	
+	if res, err = client.Api().RechargeToken(ctx, &oneapigosdk.RechargeTokenReq{
+		Key:    ONEAPI_API_KEY,
+		Amount: 1000,
 	}); err != nil {
 		t.Fatal(err.Error())
 	}

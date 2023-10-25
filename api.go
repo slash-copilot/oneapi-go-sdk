@@ -9,6 +9,7 @@ import (
 
 var (
 	PATH_TOKEN      = "/api/token"
+	PATH_RECHARGE_TOKEN      = "/api/token/recharge"
 	PATH_TOKEN_INFO = "/api/token/info"
 	PATH_ALL_LOGS   = "/api/log"
 )
@@ -46,6 +47,16 @@ type UpdateTokenReq struct {
 	ExpiredTime    int64  `json:"expired_time"`
 	RemainQuota    int    `json:"remain_quota"`
 	UnlimitedQuota bool   `json:"unlimited_quota"`
+}
+
+type RechargeTokenReq struct {
+	Key            string `json:"key"`
+	Amount         int    `json:"amount"`
+}
+
+type RechargeTokenResp struct {
+	Message string `json:"message"`
+	Success bool   `json:"success"`
 }
 
 type GetTokenResp struct {
@@ -141,6 +152,19 @@ func (api *Api) UpdateToken(ctx context.Context, req *UpdateTokenReq) (resp *Upd
 	}
 
 	var _resp UpdateTokenResp
+
+	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
+	resp = &_resp
+	return
+}
+
+func (api *Api) RechargeToken(ctx context.Context, req *RechargeTokenReq) (resp *RechargeTokenResp, err error) {
+	var r *http.Request
+	if r, err = api.createPostRequest(ctx, api.buildRequestApi(PATH_RECHARGE_TOKEN), req); err != nil {
+		return
+	}
+
+	var _resp RechargeTokenResp
 
 	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
 	resp = &_resp
