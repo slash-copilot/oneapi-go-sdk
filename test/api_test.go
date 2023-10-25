@@ -65,15 +65,15 @@ func TestUpdateToken(t *testing.T) {
 	t.Log(res)
 }
 
-func TestGetAllLogs(t *testing.T) {
+func TestGetUserLogs(t *testing.T) {
 	var client = oneapigosdk.NewClient(ONEAPI_HOST, ONEAPI_ACCESS_TOKEN)
 	var err error
 	var ctx = context.Background()
 
-	var res *oneapigosdk.GetAllLogsResp
+	var res *oneapigosdk.GetUserLogsResp
 	var pageNo = 1
 
-	if res, err = client.Api().GetAllLogs(ctx, &oneapigosdk.GetAllLogsReq{
+	if res, err = client.Api().GetUserLogs(ctx, &oneapigosdk.GetUserLogsReq{
 		P:	&pageNo,
 	}); err != nil {
 		t.Fatal(err.Error())

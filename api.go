@@ -11,7 +11,7 @@ var (
 	PATH_TOKEN      = "/api/token"
 	PATH_RECHARGE_TOKEN      = "/api/token/recharge"
 	PATH_TOKEN_INFO = "/api/token/info"
-	PATH_ALL_LOGS   = "/api/log"
+	PATH_USER_LOGS   = "/api/log/self"
 )
 
 type Token struct {
@@ -86,17 +86,16 @@ type Log struct {
 	ChannelId        int    `json:"channel"`
 }
 
-type GetAllLogsReq struct {
-	P              *int    `json:"p"`
-	Type           *int    `json:"type"`	
-	TokenName      *string `json:"token_name"`
+type GetUserLogsReq struct {
+	P              int    `json:"p"`
+	Type           int    `json:"type"`	
+	TokenName      string `json:"token_name"`
 	ModelName      *string `json:"model_name"`
 	StartTimestamp *int64  `json:"start_timestamp"`
 	EndTimestamp   *int64  `json:"end_timestamp"`
-	Channel        *int    `json:"channel"`
 }
 
-type GetAllLogsResp struct {
+type GetUserLogsResp struct {
 	Data    []*Log `json:"data"`
 	Message string `json:"message"`
 	Success bool   `json:"success"`
@@ -183,18 +182,11 @@ func (api *Api) GetTokenStatus(ctx context.Context, key string) (resp *GetTokenR
 	return
 }
 
-func (api *Api) GetAllLogs(ctx context.Context, req *GetAllLogsReq) (resp *GetAllLogsResp, err error) {
+func (api *Api) GetUserLogs(ctx context.Context, req *GetUserLogsReq) (resp *GetUserLogsResp, err error) {
 	var u = url.Values{}
-	if req.P != nil {
-		u.Set("p", fmt.Sprintf("%d", *req.P))
-	}
-	if req.Type != nil {
-		u.Set("type", fmt.Sprintf("%d", *req.Type))
-	}
-	
-	if req.TokenName != nil {
-		u.Set("token_name", *req.TokenName)
-	}
+	u.Set("p", fmt.Sprintf("%d", req.P))
+	u.Set("type", fmt.Sprintf("%d", req.Type))
+	u.Set("token_name", req.TokenName)
 	
 	if req.StartTimestamp != nil {
 		u.Set("start_timestamp", fmt.Sprintf("%d", *req.StartTimestamp))
@@ -202,16 +194,13 @@ func (api *Api) GetAllLogs(ctx context.Context, req *GetAllLogsReq) (resp *GetAl
 	if req.EndTimestamp != nil {
 		u.Set("end_timestamp", fmt.Sprintf("%d", *req.EndTimestamp))
 	}
-	if req.Channel != nil {
-		u.Set("channel", fmt.Sprintf("%d", *req.Channel))
-	}
 
 	var r *http.Request
-	if r, err = api.createGetRequest(ctx, api.buildRequestApi(PATH_ALL_LOGS), u); err != nil {
+	if r, err = api.createGetRequest(ctx, api.buildRequestApi(PATH_USER_LOGS), u); err != nil {
 		return
 	}
 
-	var _resp GetAllLogsResp
+	var _resp GetUserLogsResp
 	err = api.c.SetHttpRequest(r).SendRequest(&_resp)
 	resp = &_resp
 	return
