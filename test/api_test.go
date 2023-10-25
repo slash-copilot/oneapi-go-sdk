@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
-	"time"
 
 	oneapigosdk "github.com/slash-copilot/oneapi-go-sdk"
 )
@@ -72,15 +71,10 @@ func TestGetAllLogs(t *testing.T) {
 	var ctx = context.Background()
 
 	var res *oneapigosdk.GetAllLogsResp
+	var pageNo = 1
+	
 	if res, err = client.Api().GetAllLogs(ctx, &oneapigosdk.GetAllLogsReq{
-		P:              0,
-		Type:           0,
-		Username:       "",
-		TokenName:      "",
-		ModelName:      "",
-		StartTimestamp: 0,
-		EndTimestamp:   time.Now().Unix(),
-		Channel:        0,
+		P:	&pageNo,
 	}); err != nil {
 		t.Fatal(err.Error())
 	}

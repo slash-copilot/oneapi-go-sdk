@@ -61,7 +61,7 @@ type UpdateTokenResp struct {
 }
 
 type Log struct {
-	Id               int    `json:"id;index:idx_created_at_id,priority:1"`
+	Id               int    `json:"id"`
 	UserId           int    `json:"user_id"`
 	CreatedAt        int64  `json:"created_at"`
 	Type             int    `json:"type"`
@@ -76,14 +76,13 @@ type Log struct {
 }
 
 type GetAllLogsReq struct {
-	P              int    `json:"p"`
-	Type           int    `json:"type"`
-	Username       string `json:"username"`
-	TokenName      string `json:"token_name"`
-	ModelName      string `json:"model_name"`
-	StartTimestamp int64  `json:"start_timestamp"`
-	EndTimestamp   int64  `json:"end_timestamp"`
-	Channel        int    `json:"channel"`
+	P              *int    `json:"p"`
+	Type           *int    `json:"type"`	
+	TokenName      *string `json:"token_name"`
+	ModelName      *string `json:"model_name"`
+	StartTimestamp *int64  `json:"start_timestamp"`
+	EndTimestamp   *int64  `json:"end_timestamp"`
+	Channel        *int    `json:"channel"`
 }
 
 type GetAllLogsResp struct {
@@ -162,14 +161,26 @@ func (api *Api) GetTokenStatus(ctx context.Context, key string) (resp *GetTokenR
 
 func (api *Api) GetAllLogs(ctx context.Context, req *GetAllLogsReq) (resp *GetAllLogsResp, err error) {
 	var u = url.Values{}
-	u.Set("p", fmt.Sprintf("%d", req.P))
-	u.Set("type", fmt.Sprintf("%d", req.Type))
-	u.Set("username", req.Username)
-	u.Set("token_name", req.TokenName)
-	u.Set("model_name", req.ModelName)
-	u.Set("start_timestamp", fmt.Sprintf("%d", req.StartTimestamp))
-	u.Set("end_timestamp", fmt.Sprintf("%d", req.EndTimestamp))
-	u.Set("channel", fmt.Sprintf("%d", req.Channel))
+	if req.P != nil {
+		u.Set("p", fmt.Sprintf("%d", *req.P))
+	}
+	if req.Type != nil {
+		u.Set("type", fmt.Sprintf("%d", *req.Type))
+	}
+	
+	if req.TokenName != nil {
+		u.Set("token_name", *req.TokenName)
+	}
+	
+	if req.StartTimestamp != nil {
+		u.Set("start_timestamp", fmt.Sprintf("%d", *req.StartTimestamp))
+	}
+	if req.EndTimestamp != nil {
+		u.Set("end_timestamp", fmt.Sprintf("%d", *req.EndTimestamp))
+	}
+	if req.Channel != nil {
+		u.Set("channel", fmt.Sprintf("%d", *req.Channel))
+	}
 
 	var r *http.Request
 	if r, err = api.createGetRequest(ctx, api.buildRequestApi(PATH_ALL_LOGS), u); err != nil {
