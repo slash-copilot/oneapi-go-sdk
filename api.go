@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	PATH_TOKEN      = "/api/token"
-	PATH_RECHARGE_TOKEN      = "/api/token/recharge"
-	PATH_TOKEN_INFO = "/api/token/info"
-	PATH_USER_LOGS   = "/api/log/self"
+	PATH_TOKEN          = "/api/token"
+	PATH_RECHARGE_TOKEN = "/api/token/recharge"
+	PATH_TOKEN_INFO     = "/api/token/info"
+	PATH_USER_LOGS      = "/api/log/self"
 )
 
 type Token struct {
@@ -50,8 +50,8 @@ type UpdateTokenReq struct {
 }
 
 type RechargeTokenReq struct {
-	Key            string `json:"key"`
-	Amount         int    `json:"amount"`
+	Key    string `json:"key"`
+	Amount int    `json:"amount"`
 }
 
 type RechargeTokenResp struct {
@@ -87,9 +87,9 @@ type Log struct {
 }
 
 type GetUserLogsReq struct {
-	P              int    `json:"p"`
-	Type           int    `json:"type"`	
-	TokenName      string `json:"token_name"`
+	P              int     `json:"p"`
+	Type           []int   `json:"type"`
+	TokenName      string  `json:"token_name"`
 	ModelName      *string `json:"model_name"`
 	StartTimestamp *int64  `json:"start_timestamp"`
 	EndTimestamp   *int64  `json:"end_timestamp"`
@@ -185,9 +185,14 @@ func (api *Api) GetTokenStatus(ctx context.Context, key string) (resp *GetTokenR
 func (api *Api) GetUserLogs(ctx context.Context, req *GetUserLogsReq) (resp *GetUserLogsResp, err error) {
 	var u = url.Values{}
 	u.Set("p", fmt.Sprintf("%d", req.P))
-	u.Set("type", fmt.Sprintf("%d", req.Type))
 	u.Set("token_name", req.TokenName)
-	
+
+	if req.Type != nil {
+		for _, v := range req.Type {
+			u.Add("type", fmt.Sprintf("%d", v))
+		}
+	}
+
 	if req.StartTimestamp != nil {
 		u.Set("start_timestamp", fmt.Sprintf("%d", *req.StartTimestamp))
 	}

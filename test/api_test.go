@@ -71,10 +71,10 @@ func TestGetUserLogs(t *testing.T) {
 	var ctx = context.Background()
 
 	var res *oneapigosdk.GetUserLogsResp
-	var pageNo = 1
 
 	if res, err = client.Api().GetUserLogs(ctx, &oneapigosdk.GetUserLogsReq{
-		P:	&pageNo,
+		P:    1,
+		Type: []int{1, 2},
 	}); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -88,7 +88,7 @@ func TestRechargeToken(t *testing.T) {
 	var ctx = context.Background()
 
 	var res *oneapigosdk.RechargeTokenResp
-	
+
 	if res, err = client.Api().RechargeToken(ctx, &oneapigosdk.RechargeTokenReq{
 		Key:    ONEAPI_API_KEY,
 		Amount: 1000,
