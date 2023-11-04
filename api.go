@@ -30,6 +30,7 @@ type Token struct {
 
 type AddTokenReq struct {
 	Name           string `json:"name"`
+	Remark 	   	   string `json:"remark"`
 	ExpiredTime    int64  `json:"expired_time"`
 	RemainQuota    int    `json:"remain_quota"`
 	UnlimitedQuota bool   `json:"unlimited_quota"`
